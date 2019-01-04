@@ -4,10 +4,10 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   tools {
-    nodejs 'node-latest'
+    nodejs 'node-lts'
   }
   parameters {
-    string(name: 'IMAGE_REPO_NAME', defaultValue: 'jamessmith52963/basic-react', description: '')
+    string(name: 'IMAGE_REPO_NAME', defaultValue: 'icoelho/basic-react', description: '')
     string(name: 'LATEST_BUILD_TAG', defaultValue: 'build-latest', description: '')
     string(name: 'DOCKER_COMPOSE_FILENAME', defaultValue: 'docker-compose.yml', description: '')
     string(name: 'DOCKER_STACK_NAME', defaultValue: 'react_stack', description: '')
@@ -42,11 +42,11 @@ pipeline {
         BUILD_IMAGE_REPO_TAG = "${params.IMAGE_REPO_NAME}:${env.BUILD_TAG}"
       }
       steps{
-        sh "docker build . -t $BUILD_IMAGE_REPO_TAG"
-        sh "docker tag $BUILD_IMAGE_REPO_TAG ${params.IMAGE_REPO_NAME}:$COMMIT_TAG"
-        sh "docker tag $BUILD_IMAGE_REPO_TAG ${params.IMAGE_REPO_NAME}:${readJSON(file: 'package.json').version}"
-        sh "docker tag $BUILD_IMAGE_REPO_TAG ${params.IMAGE_REPO_NAME}:${params.LATEST_BUILD_TAG}"
-        sh "docker tag $BUILD_IMAGE_REPO_TAG ${params.IMAGE_REPO_NAME}:$BRANCH_NAME-latest"
+        sh "sudo docker build . -t $BUILD_IMAGE_REPO_TAG"
+        sh "sudo docker tag $BUILD_IMAGE_REPO_TAG ${params.IMAGE_REPO_NAME}:$COMMIT_TAG"
+        sh "sudo docker tag $BUILD_IMAGE_REPO_TAG ${params.IMAGE_REPO_NAME}:${readJSON(file: 'package.json').version}"
+        sh "sudo docker tag $BUILD_IMAGE_REPO_TAG ${params.IMAGE_REPO_NAME}:${params.LATEST_BUILD_TAG}"
+        sh "sudo docker tag $BUILD_IMAGE_REPO_TAG ${params.IMAGE_REPO_NAME}:$BRANCH_NAME-latest"
       }
     }
     stage('docker push'){
@@ -60,11 +60,11 @@ pipeline {
         BUILD_IMAGE_REPO_TAG = "${params.IMAGE_REPO_NAME}:${env.BUILD_TAG}"
       }
       steps{
-        sh "docker push $BUILD_IMAGE_REPO_TAG"
-        sh "docker push ${params.IMAGE_REPO_NAME}:$COMMIT_TAG"
-        sh "docker push ${params.IMAGE_REPO_NAME}:${readJSON(file: 'package.json').version}"
-        sh "docker push ${params.IMAGE_REPO_NAME}:${params.LATEST_BUILD_TAG}"
-        sh "docker push ${params.IMAGE_REPO_NAME}:$BRANCH_NAME-latest"
+        sh "sudo docker push $BUILD_IMAGE_REPO_TAG"
+        sh "sudo docker push ${params.IMAGE_REPO_NAME}:$COMMIT_TAG"
+        sh "sudo docker push ${params.IMAGE_REPO_NAME}:${readJSON(file: 'package.json').version}"
+        sh "sudo docker push ${params.IMAGE_REPO_NAME}:${params.LATEST_BUILD_TAG}"
+        sh "sudo docker push ${params.IMAGE_REPO_NAME}:$BRANCH_NAME-latest"
       }
     }
     stage('Remove Previous Stack'){
@@ -74,14 +74,14 @@ pipeline {
         }
       }
       steps{
-        sh "docker stack rm ${params.DOCKER_STACK_NAME}"
+        sh "sudo docker stack rm ${params.DOCKER_STACK_NAME}"
 	      
 		      
       }
     }
     stage('Docker Stack Deploy'){
       steps{
-        sh "docker stack deploy -c ${params.DOCKER_COMPOSE_FILENAME} ${params.DOCKER_STACK_NAME}"
+        sh "sudo docker stack deploy -c ${params.DOCKER_COMPOSE_FILENAME} ${params.DOCKER_STACK_NAME}"
       }
     }
   }
