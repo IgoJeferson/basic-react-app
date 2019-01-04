@@ -4,7 +4,7 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   tools {
-    nodejs 'node-lts'
+    nodejs 'nodejs-lts'
   }
   parameters {
     string(name: 'IMAGE_REPO_NAME', defaultValue: 'icoelho/basic-react', description: '')
